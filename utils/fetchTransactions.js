@@ -11,7 +11,7 @@ const mongoDBClient = new MongoClient(dbEndPoint);
 
 /**
  * Handles /transaction route and saves all transactions of an account number in DB.
- * @param userAddress : user address used for fetching the transactions
+ * @param {user address used for fetching the transactions} userAddress
  * @returns Successful message for saving all the transcations back to mongoDB Server
  */
 async function fetchTransactions(userAddress) {
@@ -19,8 +19,8 @@ async function fetchTransactions(userAddress) {
     const response = await axios.get(url);
     const data = response.data.result;
 
-    const dbMetricsLabel = {
-        operation: "updateUserDatabase",
+    const dbMetricsLabels = {
+        operation: "updateUserTransactions",
     };
 
     console.log(
@@ -29,24 +29,30 @@ async function fetchTransactions(userAddress) {
 
     const db = mongoDBClient.db(dbName);
     const collection = db.collection("transactions");
+    const timer = databaseResponseTimeHistogram.startTimer();
 
-    const dbData = await collection.findOneAndUpdate(
-        {
-            userAddress,
-        },
-        {
-            $set: { transactions: data },
-        },
-        {
-            upsert: true,
-            returnDocument: "after",
-        }
-    );
-    console.log(
-        `Saved total ${dbData.value.transactions.length} transactions for account: ${dbData.value.userAddress}`
-    );
-
-    return dbData.value;
+    try {
+        const dbData = await collection.findOneAndUpdate(
+            {
+                userAddress,
+            },
+            {
+                $set: { transactions: data },
+            },
+            {
+                upsert: true,
+                returnDocument: "after",
+            }
+        );
+        console.log(
+            `Saved total ${dbData.value.transactions.length} transactions for account: ${dbData.value.userAddress}`
+        );
+        timer({ ...dbMetricsLabels, success: "true" });
+        return dbData.value;
+    } catch (error) {
+        timer({ ...dbMetricsLabels, success: "false" });
+        throw error;
+    }
 }
 
 module.exports = { fetchTransactions };
