@@ -1,8 +1,8 @@
 # Koinx-SWE-Intern-Task
 
-This is a Node.js app that is containerized using `Docker` and has `Prometheus` monitoring implemented. Also i am using `cAdvisor` (container Advisor) for analyzing and exposesing resource usage and performance data from running containers.
+This is a Node.js app that is containerized using `Docker` and has `Prometheus` monitoring implemented. Also using `cAdvisor` (container Advisor) for analyzing and exposing resource usage and performance data from running containers.
 
-This REST API provides an routes to retrieve Ethereum transactions for a particular user based on their address.
+This REST API provides routes to retrieve Ethereum transactions for a particular user based on their user address.
 
 ## **Prerequisites**
 
