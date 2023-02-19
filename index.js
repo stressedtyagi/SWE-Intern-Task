@@ -7,36 +7,25 @@ const PORT = process.env.PORT || 8001;
 const dbEndPoint = process.env.DB_ENDPOINT;
 const {
     fetchTransactions,
-    startMetricsServer,
+    metricsRouter,
     restResponseTimeHistogram,
+    inProcessRequests,
 } = require("./utils");
 const authenticateAccount = require("./middleware/autenticateAccount");
 const mongoDBClient = new MongoClient(dbEndPoint);
 
 startServer();
 
-app.use(
-    responseTime((req, res, time) => {
-        if (req?.route?.path) {
-            restResponseTimeHistogram.observe(
-                {
-                    method: req.method,
-                    route: req.route.path,
-                    status_code: req.statusCode,
-                },
-                time * 1000
-            );
-        }
-    })
-);
-
 app.get("/", (req, res) => {
     res.status(200).send("Koinx SWE Intern task");
 });
 
 app.get("/transactions", authenticateAccount, async (req, res) => {
+    const end = restResponseTimeHistogram.startTimer();
+    const route = req?.route?.path;
     const { userAddress = "" } = req.query;
     try {
+        inProcessRequests.inc();
         const data = await fetchTransactions(userAddress);
         res.status(200).json({
             userAddress: data.userAddress,
@@ -44,9 +33,14 @@ app.get("/transactions", authenticateAccount, async (req, res) => {
         });
     } catch (err) {
         console.log(err);
-        res.send(501).send({ msg: err });
+        res.status(501).send({ msg: err });
+    } finally {
+        inProcessRequests.dec();
+        end({ route, code: res.statusCode, method: req.method });
     }
 });
+
+app.use("/metrics", metricsRouter);
 
 async function startServer() {
     try {
@@ -54,10 +48,8 @@ async function startServer() {
         console.log("Connected successfully to mongodb server");
 
         app.listen(PORT, () => {
-            console.log(`Koinx app running on PORT : ${PORT}`);
+            console.log(`Koinx app started at : http://localhost:${PORT}`);
         });
-
-        startMetricsServer();
     } catch (err) {
         console.error(`Error : ` + err);
     }

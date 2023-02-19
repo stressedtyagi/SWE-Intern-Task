@@ -1,13 +1,15 @@
 const { fetchTransactions } = require("./fetchTransactions");
 const {
-    startMetricsServer,
+    router: metricsRouter,
     restResponseTimeHistogram,
     databaseResponseTimeHistogram,
+    inProcessRequests,
 } = require("./metrics");
 
 module.exports = {
     fetchTransactions,
-    startMetricsServer,
+    metricsRouter,
     restResponseTimeHistogram,
     databaseResponseTimeHistogram,
+    inProcessRequests,
 };
