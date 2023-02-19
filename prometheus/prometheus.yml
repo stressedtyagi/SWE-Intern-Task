@@ -1,0 +1,9 @@
+global:
+    scrape_interval: 5s
+scrape_configs:
+    - job_name: "koinx-api"
+      static_configs:
+          - targets: ["koinx-api:8001"]
+    - job_name: "cadvisor"
+      static_configs:
+          - targets: ["cadvisor:8080"]
