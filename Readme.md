@@ -58,4 +58,4 @@ You need to have the following installed on your machine:
 
 ## **Authors**
 
--   Your Name - [stressedtyagi](https://github.com/stressedtyagi)
+-   [stressedtyagi](https://github.com/stressedtyagi)
