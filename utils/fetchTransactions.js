@@ -1,6 +1,6 @@
 const { MongoClient } = require("mongodb");
 const axios = require("axios");
-const { databaseResponseTimeHistogram } = require("./metrics");
+const { databaseResponseTimeHistogram, outliterCounter } = require("./metrics");
 
 const apiKey = process.env.ETHERSCAN_API_KEY;
 const apiEndPoint = process.env.API_ENDPOINT;
@@ -18,6 +18,12 @@ async function fetchTransactions(userAddress) {
     const url = `${apiEndPoint}?module=account&action=txlist&address=${userAddress}&startblock=0&endblock=99999999&sort=asc&apikey=${apiKey}`;
     const response = await axios.get(url);
     const data = response.data.result;
+
+    data.forEach((transaction) => {
+        if (transaction.value > 1e10) {
+            outliterCounter.inc();
+        }
+    });
 
     const dbMetricsLabels = {
         operation: "updateUserTransactions",

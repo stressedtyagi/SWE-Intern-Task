@@ -6,6 +6,7 @@ const {
     restResponseTimeHistogram,
     databaseResponseTimeHistogram,
     inProcessRequests,
+    outliterCounter,
 } = require("./metrics");
 
 module.exports = {
@@ -14,4 +15,5 @@ module.exports = {
     restResponseTimeHistogram,
     databaseResponseTimeHistogram,
     inProcessRequests,
+    outliterCounter,
 };

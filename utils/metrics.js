@@ -31,14 +31,21 @@ const inProcessRequests = new client.Gauge({
     help: "Number of requests in process",
 });
 
+const outliterCounter = new client.Counter({
+    name: "rest_outlier_transaction_total",
+    help: "Counting transctions whose value is gt 10^10",
+});
+
 /* Register the metrics with the Prometheus registry */
 register.registerMetric(restResponseTimeHistogram);
 register.registerMetric(databaseResponseTimeHistogram);
 register.registerMetric(inProcessRequests);
+register.registerMetric(outliterCounter);
 
 module.exports = {
     restResponseTimeHistogram,
     databaseResponseTimeHistogram,
     inProcessRequests,
+    outliterCounter,
     router,
 };

@@ -6,13 +6,13 @@ COPY package.json .
 
 COPY package-lock.json .
 
+RUN npm install
+
 COPY utils /koinx-api/utils
 
 COPY middleware /koinx-api/middleware
 
 COPY .env /koinx-api/.env
-
-RUN npm install
 
 COPY index.js .
 
